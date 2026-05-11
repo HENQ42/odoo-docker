@@ -50,23 +50,28 @@ RUN git clone --depth 1 --single-branch --branch 18.0 \
 # ------------------------------------------------------
 RUN set -eux; cd ${ODOO_HOME}/extra-addons; \
     printf '%s\n' \
-        account-analytic account-financial-tools contract crm field-service \
-        fleet geospatial helpdesk hr hr-expense iot knowledge l10n-brazil \
-        maintenance management-system manufacture mis-builder product-attribute \
-        project purchase-workflow repair reporting-engine server-tools server-ux \
-        sign stock-logistics-request stock-logistics-warehouse timesheet web website \
+        account-analytic account-financial-reporting account-financial-tools \
+        account-invoicing account-payment account-reconcile \
+        agreement ai bank-payment bank-statement-import commission \
+        contract crm dms field-service fleet geospatial helpdesk \
+        hr hr-expense iot knowledge l10n-brazil mail maintenance \
+        management-system manufacture manufacture-reporting mis-builder \
+        partner-contact product-attribute project purchase-workflow queue \
+        repair reporting-engine sale-reporting sale-workflow \
+        server-env server-tools server-ux sign \
+        stock-logistics-request stock-logistics-warehouse stock-logistics-workflow \
+        storage timesheet web website \
     | xargs -n1 -P8 -I{} git clone --quiet --depth 1 --single-branch --branch 18.0 \
         https://github.com/OCA/{}.git {}
 
 # ------------------------------------------------------
-# Virtualenv + dependências Python
+# Virtualenv + dependências Python (core + todos os requirements.txt dos OCAs)
 # ------------------------------------------------------
 RUN python3 -m venv ${ODOO_HOME}/venv \
     && ${ODOO_HOME}/venv/bin/pip install --upgrade pip wheel \
-    && ${ODOO_HOME}/venv/bin/pip install \
-        -r ${ODOO_HOME}/odoo/requirements.txt \
-        -r ${ODOO_HOME}/extra-addons/l10n-brazil/requirements.txt \
-        packaging
+    && ${ODOO_HOME}/venv/bin/pip install -r ${ODOO_HOME}/odoo/requirements.txt packaging \
+    && find ${ODOO_HOME}/extra-addons -maxdepth 2 -name requirements.txt -print0 \
+        | xargs -0 -I{} ${ODOO_HOME}/venv/bin/pip install -r {}
 
 WORKDIR ${ODOO_HOME}/odoo
 
