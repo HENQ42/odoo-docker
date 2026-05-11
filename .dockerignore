@@ -1,0 +1,10 @@
+.git
+.gitignore
+.env
+logs/
+log/
+*.log
+.idea
+.vscode
+README*
+nginx/

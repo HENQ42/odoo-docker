@@ -1,0 +1,40 @@
+services:
+  odoo:
+    build: .
+    container_name: odoo_app
+    restart: unless-stopped
+    network_mode: host
+    env_file:
+      - .env
+    volumes:
+      - odoo_data:/opt/odoo/.local/share/Odoo
+      - ./config:/etc/odoo
+      - ./logs:/var/log/odoo
+    command:
+      - bash
+      - -c
+      - |
+        set -e
+        sed \
+          -e "s|__DB_HOST__|${DB_HOST}|g" \
+          -e "s|__DB_PORT__|${DB_PORT}|g" \
+          -e "s|__DB_USER__|${DB_USER}|g" \
+          -e "s|__DB_PASSWORD__|${DB_PASSWORD}|g" \
+          -e "s|__DB_NAME__|${DB_NAME}|g" \
+          -e "s|__ADMIN_PASSWD__|${ADMIN_PASSWD}|g" \
+          /etc/odoo/odoo.conf > /tmp/odoo.conf
+        exec /opt/odoo/venv/bin/python3 /opt/odoo/odoo/odoo-bin -c /tmp/odoo.conf
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8069/web/database/selector >/dev/null || exit 1"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 180s
+    logging:
+      driver: json-file
+      options:
+        max-size: "20m"
+        max-file: "5"
+
+volumes:
+  odoo_data:
