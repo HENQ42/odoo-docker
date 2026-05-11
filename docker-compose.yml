@@ -8,8 +8,8 @@ services:
       - .env
     volumes:
       - odoo_data:/opt/odoo/.local/share/Odoo
-      - ./config:/etc/odoo
-      - ./logs:/var/log/odoo
+      - ./config:/etc/odoo:z
+      - ./logs:/var/log/odoo:z
     command:
       - bash
       - -c
