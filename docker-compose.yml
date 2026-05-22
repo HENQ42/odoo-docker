@@ -10,6 +10,7 @@ services:
       - odoo_data:/opt/odoo/.local/share/Odoo
       - ./config:/etc/odoo:z
       - ./logs:/var/log/odoo:z
+      - ./custom-addons:/opt/odoo/custom-addons:z
     command:
       - bash
       - -c
