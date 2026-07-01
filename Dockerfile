@@ -12,14 +12,21 @@ ENV DEBIAN_FRONTEND=noninteractive \
 # Dependências de sistema + wkhtmltopdf em uma única camada
 # ------------------------------------------------------
 RUN apt-get update && apt-get install -y --no-install-recommends \
-        ca-certificates curl git nano wget \
+        ca-certificates curl git nano wget gnupg \
         python3 python3-dev python3-pip python3-venv \
         libldap2-dev libpq-dev libsasl2-dev \
         libxml2-dev libxslt1-dev \
         libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev \
         libblas-dev libatlas-base-dev libssl-dev libffi-dev \
-        build-essential npm postgresql-client node-less \
+        build-essential npm node-less \
         fontconfig xfonts-base xfonts-75dpi \
+    && install -d /usr/share/postgresql-common/pgdg \
+    && curl -fsSL https://www.postgresql.org/media/keys/ACCC4CF8.asc \
+        -o /usr/share/postgresql-common/pgdg/apt.postgresql.org.asc \
+    && echo "deb [signed-by=/usr/share/postgresql-common/pgdg/apt.postgresql.org.asc] https://apt.postgresql.org/pub/repos/apt noble-pgdg main" \
+        > /etc/apt/sources.list.d/pgdg.list \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends postgresql-client-18 \
     && wget -q -O /tmp/wkhtmltox.deb \
         https://github.com/wkhtmltopdf/packaging/releases/download/0.12.6.1-3/wkhtmltox_0.12.6.1-3.jammy_amd64.deb \
     && apt-get install -y --no-install-recommends /tmp/wkhtmltox.deb \
